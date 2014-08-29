@@ -14,32 +14,33 @@ exports.register = function (plugin, options, next) {
         throw new Error('Arrays of endpoints are not yet supported... Patches welcome?');
     } else {
 
+
+        // HEAD - return a 200 response when the hub pings the server to see if it is up.
+        plugin.route({
+            method: 'HEAD',
+            path: '/{anything?}',
+            handler: function (request, reply) {
+                reply().code(200);
+            }
+        });
+
         Object.keys(options).forEach(function (key) {
             buildRevisitorRoutes(key, options[key]);
         });
     }
 
-    function buildRevisitorRoutes(basePath, mutator) {
+    function buildRevisitorRoutes(name, mutator) {
+        var basePath = '/' + name;
 
         if (!basePath) throw new Error('No name specified!. Please give me a name!');
         if (!mutator) throw new Error('No mutator function passed for ' + basePath + '! Please pass in a mutator!');
 
         //TODO: add support mutator to be an array of mutators. Just send the content through each one in order every time.
 
-
-        // HEAD - return a 200 response when the hub pings the server to see if it is up.
-        plugin.route({
-            method: 'HEAD',
-            path: '/' + basePath + '/',
-            handler: function (request, reply) {
-                reply().code(200);
-            }
-        });
-
         // POST - run the content through the mutator and return a revisit.link compatible object
         plugin.route({
             method: 'POST',
-            path: '/' + basePath + "/service",
+            path: basePath + "/service",
             handler: function (request, reply) {
                 var imgBuf = dataUriToBuffer(request.payload.content),
                     imgType = imgBuf.type;
