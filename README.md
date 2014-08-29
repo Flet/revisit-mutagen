@@ -34,7 +34,7 @@ You can also just go and take a look/clone [my personal version](https://github.
 
 
 
-1. Make a new directory, create a package.json and install some modules:
+1) Make a new directory, create a package.json and install some modules:
 ```
 mkdir myserver
 cd myserver
@@ -43,7 +43,7 @@ npm init
 npm install --save hapi revisit-mutagen trippyshift butts-gm
 ```
 
-2. create **index.js** in that directory with this content:
+2) create **index.js** in that directory with this content:
 
 ```javascript
 var Hapi = require('hapi');
@@ -78,7 +78,7 @@ server.pack.register({
 });
 ```
 
-3. Start the server up and check the output:
+3) Start the server up and check the output:
 ```
 node index.js
 
