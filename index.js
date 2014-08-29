@@ -3,8 +3,10 @@ var Joi = require('joi'),
 
 // http://revisit.link/spec.html
 var revisitorSchema = {
-    content: Joi.string().max(2000000),
-    meta: Joi.object().required()
+    content: {
+        data: Joi.string().max(2000000)
+    },
+    meta: Joi.object()
 };
 
 exports.register = function (plugin, options, next) {
@@ -42,15 +44,19 @@ exports.register = function (plugin, options, next) {
             method: 'POST',
             path: basePath + "/service",
             handler: function (request, reply) {
-                var imgBuf = dataUriToBuffer(request.payload.content),
+                var imgBuf = dataUriToBuffer(request.payload.content.data),
                     imgType = imgBuf.type;
 
                 mutator(imgBuf, function (err, mutatedBuffer) {
-                    if (err) reply().code(500);
+                    if (err) {
+                        reply(err).code(400);
+                    }
 
                     reply({
-                        content: "data:" + imgType + ";base64," + mutatedBuffer.toString('base64'),
-                        meta: {}
+                        content: {
+                            data: "data:" + imgType + ";base64," + imgBuf.toString('base64'),
+                        },
+                        meta: request.payload.meta
                     }).code(200);
                 });
             },
