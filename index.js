@@ -30,7 +30,7 @@ exports.register = function (plugin, options, next) {
         // HEAD - return a 200 response when the hub pings the server to see if it is up.
         plugin.route({
             method: 'HEAD',
-            path: '/' + basePath,
+            path: '/' + basePath + '/',
             handler: function (request, reply) {
                 reply().code(200);
             }
