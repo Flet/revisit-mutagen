@@ -7,14 +7,14 @@ This can be used to quickly spin up a server to serve
 
 
 the plugin options is expected to be an object with the key representing the base
-path and the value being the "mutator" function/module. Pass in one or many of these!
+path and the value being the 'mutator' function/module. Pass in one or many of these!
 Some example mutator npm modules: butts-gm, trippyshift
 
 ```javascript
 var options = {
-    "trippyshift": require('trippyshift'),
-    "butts": require('butts-gm'),
-    "mylittlemutant": function(buffer, callback) {
+    'trippyshift': require('trippyshift'),
+    'butts': require('butts-gm'),
+    'mylittlemutant': function(buffer, callback) {
         //awesome goes here
         callback(null, someMutatedbuffer)
     }
@@ -47,12 +47,12 @@ var server = Hapi.createServer('localhost', process.env.PORT || 8080);
 server.pack.register({
     plugin: require('revisit-mutagen'),
 
-    // the "key" is the route to expose and the "value" is a mutator function/module
+    // the 'key' is the route to expose and the 'value' is a mutator function/module
     options: {
         'trippyshift': require('trippyshift'),
         'butts': require('butts-gm'),
         'echoplease': function (buffer, callback) {
-            // you can just write your own "mutator" inline too!
+            // you can just write your own 'mutator' inline too!
             callback(null, buffer);
         }
     }
@@ -63,10 +63,10 @@ server.pack.register({
 
         // list out all the routes for verification
         server.table().forEach(function (row) {
-            console.log(server.info.uri + row.path + " (" + row.method + ")");
+            console.log(server.info.uri + row.path + ' (' + row.method + ')');
         });
 
-        console.log("Hapi server started @", server.info.uri);
+        console.log('Hapi server started @', server.info.uri);
     });
 
 });
