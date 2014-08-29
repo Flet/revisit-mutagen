@@ -1,0 +1,25 @@
+{
+  "name": "revisit-mutagen",
+  "version": "1.0.0",
+  "description": "A hapi plugin to easily expose a http://revisit.link mutation as a service that adheres to http://revisit.link/spec.html",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/lab/bin/lab -c -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Flet/revisit-mutagen"
+  },
+  "keywords": [
+    "revisit"
+  ],
+  "author": "Dan Flettre",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Flet/revisit-mutagen/issues"
+  },
+  "homepage": "https://github.com/Flet/revisit-mutagen",
+  "devDependencies": {
+    "lab": "^4.2.0"
+  }
+}
