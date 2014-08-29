@@ -26,9 +26,15 @@ should then execute the callback with a buffer as the second argument
 or an error as the first argument.
 
 
-Full example Server:
+Full example Server
+-------------------
+Follow the instructions below to create a new hapi server using this plugin.
 
-Make a new directory, create a package.json and install some modules:
+You can also just go and take a look/clone [my personal version](https://github.com/Flet/technodrome).
+
+
+
+1. Make a new directory, create a package.json and install some modules:
 ```
 mkdir myserver
 cd myserver
@@ -37,7 +43,7 @@ npm init
 npm install --save hapi revisit-mutagen trippyshift butts-gm
 ```
 
-create index.js in that directory with this content:
+2. create **index.js** in that directory with this content:
 
 ```javascript
 var Hapi = require('hapi');
@@ -72,7 +78,7 @@ server.pack.register({
 });
 ```
 
-Start the server up and check the output:
+3. Start the server up and check the output:
 ```
 node index.js
 
