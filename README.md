@@ -30,7 +30,7 @@ Full example Server
 -------------------
 Follow the instructions below to create a new hapi server using this plugin.
 
-You can also just go and take a look/clone [my personal version](https://github.com/Flet/technodrome).
+You can also just go and take a look at or clone [my personal version](https://github.com/Flet/technodrome).
 
 
 
