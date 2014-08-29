@@ -37,7 +37,6 @@ server.pack.register({
     plugin: require('revist-mutagen'),
 
     // the "key" is the route to expose and the "value" is a mutator function/module
-    ```
     options: {
         'trippyshift': require('trippyshift'),
         'butts': require('butts-gm'),
@@ -46,8 +45,6 @@ server.pack.register({
             callback(null, buffer);
         }
     }
-    ```
-
 }, function (err) {
     if (err) throw err;
     server.start(function () {
