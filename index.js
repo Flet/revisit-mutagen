@@ -1,15 +1,19 @@
 var Joi = require('joi'),
-    dataUriToBuffer = require('data-uri-to-buffer');
+    dataUriToBuffer = require('data-uri-to-buffer'),
+    fs = require('fs');
 
 // http://revisit.link/spec.html
 var revisitorSchema = {
-    content: {
-        data: Joi.string().max(2000000)
+        content: {
+            data: Joi.string().max(2000000)
+        },
+        meta: Joi.object()
     },
-    meta: Joi.object()
-};
+    samples = {};
 
 exports.register = function (plugin, options, next) {
+
+    var sampleBuf = fs.readFileSync(__dirname + '/sample.jpg');
 
     if (Array.isArray(options)) {
         //TODO: support an array of "long form" objects and future potential to pass a mutator-specific options object.
@@ -32,12 +36,26 @@ exports.register = function (plugin, options, next) {
     }
 
     function buildRevisitorRoutes(name, mutator) {
+
+        // lets generate a sample
+        mutator(sampleBuf, function (err, newsample) {
+            samples[name] = newsample;
+        });
+
         var basePath = '/' + name;
 
         if (!basePath) throw new Error('No name specified!. Please give me a name!');
         if (!mutator) throw new Error('No mutator function passed for ' + basePath + '! Please pass in a mutator!');
 
         //TODO: add support mutator to be an array of mutators. Just send the content through each one in order every time.
+
+        plugin.route({
+            method: 'GET',
+            path: basePath + '/sample.jpg',
+            handler: function(request, reply) {
+                reply(samples[name]).type('image/jpeg');
+            }
+        });
 
         // POST - run the content through the mutator and return a revisit.link compatible object
         plugin.route({
