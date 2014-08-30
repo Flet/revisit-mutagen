@@ -72,7 +72,7 @@ exports.register = function (plugin, options, next) {
 
                     reply({
                         content: {
-                            data: "data:" + imgType + ";base64," + imgBuf.toString('base64'),
+                            data: "data:" + imgType + ";base64," + mutatedBuffer.toString('base64'),
                         },
                         meta: request.payload.meta
                     }).code(200);
