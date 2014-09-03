@@ -9,11 +9,13 @@ var revisitorSchema = {
         },
         meta: Joi.object()
     },
-    samples = {};
+    jpgSamples = {},
+    gifSamples = {};
 
 exports.register = function (plugin, options, next) {
 
-    var sampleBuf = fs.readFileSync(__dirname + '/sample.jpg');
+    var jpgSampleBuf = fs.readFileSync(__dirname + '/sample.jpg'),
+        gifSampleBuf = fs.readFileSync(__dirname + '/sample.gif');
 
     if (Array.isArray(options)) {
         //TODO: support an array of "long form" objects and future potential to pass a mutator-specific options object.
@@ -37,9 +39,14 @@ exports.register = function (plugin, options, next) {
 
     function buildRevisitorRoutes(name, mutator) {
 
-        // lets generate a sample
-        mutator(sampleBuf, function (err, newsample) {
-            samples[name] = newsample;
+        // lets generate a jpeg sample
+        mutator(jpgSampleBuf, function (err, newsample) {
+            jpgSamples[name] = newsample;
+        });
+
+        // lets generate a gif sample
+        mutator(gifSampleBuf, function (err, newsample) {
+            gifSamples[name] = newsample;
         });
 
         var basePath = '/' + name;
@@ -52,8 +59,36 @@ exports.register = function (plugin, options, next) {
         plugin.route({
             method: 'GET',
             path: basePath + '/sample.jpg',
-            handler: function(request, reply) {
-                reply(samples[name]).type('image/jpeg');
+            handler: function (request, reply) {
+                reply(jpgSamples[name]).type('image/jpeg');
+            }
+        });
+
+        plugin.route({
+            method: 'GET',
+            path: basePath + '/sample.gif',
+            handler: function (request, reply) {
+                reply(gifSamples[name]).type('image/gif');
+            }
+        });
+
+        plugin.route({
+            method: 'GET',
+            path: basePath + '/livesample.jpg',
+            handler: function (request, reply) {
+                mutator(jpgSampleBuf, function (err, newsample) {
+                    reply(newsample).type('image/jpeg');
+                });
+            }
+        });
+
+        plugin.route({
+            method: 'GET',
+            path: basePath + '/livesample.gif',
+            handler: function (request, reply) {
+                mutator(gifSampleBuf, function (err, newsample) {
+                    reply(newsample).type('image/gif');
+                });
             }
         });
 
