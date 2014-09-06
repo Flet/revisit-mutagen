@@ -111,7 +111,7 @@ Hapi server started @ http://0.0.0.0:8080
 Now you can visit either of these URLs to see your glitch:
 ```
 http://localhost:8080/myglitch/livesample.gif
-http://localhost:8080/myglitch/livesample.gif
+http://localhost:8080/myglitch/livesample.jpg
 ```
 
 Cool! Now, for faster iteration, using something like `nodemon` will help. It will basically restart the server whenever it detects a change. This means you can tweak your glitch and quickly see the results after saving:
