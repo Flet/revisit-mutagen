@@ -28,7 +28,7 @@ or an error as the first argument.
 
 Full example Server
 -------------------
-Follow the instructions below to create a new hapi server using this plugin.
+Follow the instructions below to create a new hapi server using this plugin. This also shows how to create a simple glitch using `glitcher`.
 
 You can also just go and take a look at or clone [my personal version](https://github.com/Flet/technodrome).
 
@@ -40,39 +40,54 @@ mkdir myserver
 cd myserver
 npm init
 <<fill things in, press enter a lot>>
-npm install --save hapi revisit-mutagen trippyshift butts-gm
+npm install --save hapi revisit-mutagen readimage glitcher writegif
 ```
 
 2) create **index.js** in that directory with this content:
 
 ```javascript
-var Hapi = require('hapi');
-
-var server = Hapi.createServer('localhost', process.env.PORT || 8080);
+var Hapi = require('hapi'),
+    server = Hapi.createServer('0.0.0.0', process.env.PORT || 8080);
 
 server.pack.register({
     plugin: require('revisit-mutagen'),
-
-    // the 'key' is the route to expose and the 'value' is a mutator function/module
     options: {
-        'trippyshift': require('trippyshift'),
-        'butts': require('butts-gm'),
-        'echoplease': function (buffer, callback) {
-            // you can just write your own 'mutator' inline too!
-            callback(null, buffer);
+        'myglitch': function(buffer, callback) {
+            // you can just write your own glitch inline or require() it in
+
+            var readimage = require('readimage'),
+                glitcher = require('glitcher'),
+                gifWriter = require('writegif');
+
+            readimage(buffer, function(err, image) {
+                if (err) {
+                    return callback(err);
+                }
+
+                if (image.frames.length == 1) {
+                    glitcher.rainbowClamp(image.frames[0].data);
+                } else {
+                    glitcher.rainbow(image.frames);
+                }
+
+                gifWriter(image, function(err, finalgif) {
+                    return callback(null, finalgif);
+                });
+
+            });
+
         }
     }
-
-}, function (err) {
+}, function(err) {
     if (err) throw err;
-    server.start(function () {
+    server.start(function() {
 
         // list out all the routes for verification
-        server.table().forEach(function (row) {
-            console.log(server.info.uri + row.path + ' (' + row.method + ')');
+        server.table().forEach(function(row) {
+            console.log(server.info.uri + row.path + " (" + row.method + ")");
         });
 
-        console.log('Hapi server started @', server.info.uri);
+        console.log("Hapi server started @", server.info.uri);
     });
 
 });
@@ -80,15 +95,36 @@ server.pack.register({
 
 3) Start the server up and check the output:
 ```
-node index.js
+npm start
 
 ...
 
-http://localhost:8080/butts/ (head)
-http://localhost:8080/echoplease/ (head)
-http://localhost:8080/trippyshift/ (head)
-http://localhost:8080/butts/service (post)
-http://localhost:8080/echoplease/service (post)
-http://localhost:8080/trippyshift/service (post)
-Hapi server started @ http://localhost:8080
+http://0.0.0.0:8080/{anything?} (head)
+http://0.0.0.0:8080/myglitch/sample.gif (get)
+http://0.0.0.0:8080/myglitch/sample.jpg (get)
+http://0.0.0.0:8080/myglitch/livesample.gif (get)
+http://0.0.0.0:8080/myglitch/livesample.jpg (get)
+http://0.0.0.0:8080/myglitch/service (post)
+Hapi server started @ http://0.0.0.0:8080
 ```
+
+Now you can visit either of these URLs to see your glitch:
+```
+http://localhost:8080/myglitch/livesample.gif
+http://localhost:8080/myglitch/livesample.gif
+```
+
+Cool! Now, for faster iteration, using something like `nodemon` will help. It will basically restart the server whenever it detects a change. This means you can tweak your glitch and quickly see the results after saving:
+```
+npm install -g nodemon
+```
+Now start the server with the `nodemon` command:
+```
+nodemon
+```
+
+Leave a browser window open pointing to `http://localhost:8080/myglitch/livesample.gif` and whenever you want to see the latest iteration just refresh the window.
+
+
+
+
