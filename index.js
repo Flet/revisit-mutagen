@@ -4,17 +4,18 @@ var Joi = require('joi'),
     path = require('path');
 
 // http://revisit.link/spec.html
-var revisitorSchema = {
-        content: {
-            data: Joi.string().max(2000000)
-        },
-        meta: Joi.object()
-    },
-    jpgSamples = {},
+var jpgSamples = {},
     gifSamples = {},
     moreSampleBufs = {};
 
 exports.register = function(plugin, options, next) {
+
+    var revisitorSchema = {
+        content: {
+            data: Joi.string().max(options.maxDataSize || 2000000)
+        },
+        meta: Joi.object()
+    };
 
     var sampleGif = options.sampleGif || __dirname + '/sample.gif',
         sampleJpg = options.sampleJpg || __dirname + '/sample.jpg';
