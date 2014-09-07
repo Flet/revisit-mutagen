@@ -1,6 +1,7 @@
 var Joi = require('joi'),
     dataUriToBuffer = require('data-uri-to-buffer'),
-    fs = require('fs');
+    fs = require('fs'),
+    path = require('path');
 
 // http://revisit.link/spec.html
 var revisitorSchema = {
@@ -10,15 +11,25 @@ var revisitorSchema = {
         meta: Joi.object()
     },
     jpgSamples = {},
-    gifSamples = {};
+    gifSamples = {},
+    moreSampleBufs = {};
 
-exports.register = function (plugin, options, next) {
+exports.register = function(plugin, options, next) {
 
-    var jpgSampleBuf = fs.readFileSync(__dirname + '/sample.jpg'),
-        gifSampleBuf = fs.readFileSync(__dirname + '/sample.gif');
+    var sampleGif = options.sampleGif || __dirname + '/sample.gif',
+        sampleJpg = options.sampleJpg || __dirname + '/sample.jpg';
 
-    if (Array.isArray(options)) {
-        //TODO: support an array of "long form" objects and future potential to pass a mutator-specific options object.
+    var jpgSampleBuf = fs.readFileSync(sampleJpg),
+        gifSampleBuf = fs.readFileSync(sampleGif),
+        glitches = options.glitches,
+        moreSamples = options.moreSamples;
+
+    if (!glitches) {
+        throw new Error('no options.glitches were passed!');
+    }
+
+    if (Array.isArray(glitches)) {
+        //TODO: support an array of "long form" objects and future potential to pass a mutator-specific glitches object.
         throw new Error('Arrays of endpoints are not yet supported... Patches welcome?');
     } else {
 
@@ -27,25 +38,25 @@ exports.register = function (plugin, options, next) {
         plugin.route({
             method: 'HEAD',
             path: '/{anything?}',
-            handler: function (request, reply) {
+            handler: function(request, reply) {
                 reply().code(200);
             }
         });
 
-        Object.keys(options).forEach(function (key) {
-            buildRevisitorRoutes(key, options[key]);
+        Object.keys(glitches).forEach(function(key) {
+            buildRevisitorRoutes(key, glitches[key]);
         });
     }
 
     function buildRevisitorRoutes(name, mutator) {
 
         // lets generate a jpeg sample
-        mutator(jpgSampleBuf, function (err, newsample) {
+        mutator(jpgSampleBuf, function(err, newsample) {
             jpgSamples[name] = newsample;
         });
 
         // lets generate a gif sample
-        mutator(gifSampleBuf, function (err, newsample) {
+        mutator(gifSampleBuf, function(err, newsample) {
             gifSamples[name] = newsample;
         });
 
@@ -59,7 +70,7 @@ exports.register = function (plugin, options, next) {
         plugin.route({
             method: 'GET',
             path: basePath + '/sample.jpg',
-            handler: function (request, reply) {
+            handler: function(request, reply) {
                 reply(jpgSamples[name]).type('image/jpeg');
             }
         });
@@ -67,7 +78,7 @@ exports.register = function (plugin, options, next) {
         plugin.route({
             method: 'GET',
             path: basePath + '/sample.gif',
-            handler: function (request, reply) {
+            handler: function(request, reply) {
                 reply(gifSamples[name]).type('image/gif');
             }
         });
@@ -75,8 +86,8 @@ exports.register = function (plugin, options, next) {
         plugin.route({
             method: 'GET',
             path: basePath + '/livesample.jpg',
-            handler: function (request, reply) {
-                mutator(jpgSampleBuf, function (err, newsample) {
+            handler: function(request, reply) {
+                mutator(jpgSampleBuf, function(err, newsample) {
                     reply(newsample).type('image/jpeg');
                 });
             }
@@ -85,22 +96,42 @@ exports.register = function (plugin, options, next) {
         plugin.route({
             method: 'GET',
             path: basePath + '/livesample.gif',
-            handler: function (request, reply) {
-                mutator(gifSampleBuf, function (err, newsample) {
+            handler: function(request, reply) {
+                mutator(gifSampleBuf, function(err, newsample) {
                     reply(newsample).type('image/gif');
                 });
             }
         });
 
+        //more samples will always be "live"
+        if (moreSamples) {
+            moreSamples.forEach(function(sample) {
+                moreSampleBufs[sample] = fs.readFileSync(sample);
+                var ext = path.extname(sample);
+                if (ext === 'jpg') ext = 'jpeg';
+                ext = ext.slice(1);
+
+                plugin.route({
+                    method: 'GET',
+                    path: basePath + '/' + path.basename(sample),
+                    handler: function(request, reply) {
+                        mutator(moreSampleBufs[sample], function(err, newsample) {
+                            reply(newsample).type('image/' + ext);
+                        });
+                    }
+                });
+            });
+        }
+
         // POST - run the content through the mutator and return a revisit.link compatible object
         plugin.route({
             method: 'POST',
             path: basePath + "/service",
-            handler: function (request, reply) {
+            handler: function(request, reply) {
                 var imgBuf = dataUriToBuffer(request.payload.content.data),
                     imgType = imgBuf.type;
 
-                mutator(imgBuf, function (err, mutatedBuffer) {
+                mutator(imgBuf, function(err, mutatedBuffer) {
                     if (err) {
                         reply(err).code(400);
                     }
