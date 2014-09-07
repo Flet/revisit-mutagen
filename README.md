@@ -29,10 +29,10 @@ or an error as the first argument.
 
 Additional Options
 ------------------
-**maxDataSize** (number) - set the max size of data that can be POSTed to the service. Default 2000000 (2MB).
-**sampleGif** (string) - file path to a gif image to override the default sample.gif. Note that the guideline is a 60x60 image for samples on the hub.
-**sampleJpg** (string) - file path to a gif image to override the default sample.jpg
-**moreSamples** (array of strings) - array of file paths to additional images to expose as GET urls. The url will be derived from the file name: /myglitch/**pug.gif**. Be sure that your custom file names will not conflict with existing paths (i.e. don't name them sample.jpg or sample.gif)
+* **maxDataSize** (number) - set the max size of data that can be POSTed to the service. Default 2000000 (2MB).
+* **sampleGif** (string) - file path to a gif image to override the default sample.gif. Note that the guideline is a 60x60 image for samples on the hub.
+* **sampleJpg** (string) - file path to a gif image to override the default sample.jpg
+* **moreSamples** (array of strings) - array of file paths to additional images to expose as GET urls. The url will be derived from the file name: /myglitch/**pug.gif**. Be sure that your custom file names will not conflict with existing paths (i.e. don't name them sample.jpg or sample.gif)
 
 Here is an example options object with all these options enabled:
 
