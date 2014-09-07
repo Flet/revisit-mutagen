@@ -12,11 +12,13 @@ Some example mutator npm modules: butts-gm, trippyshift
 
 ```javascript
 var options = {
-    'trippyshift': require('trippyshift'),
-    'butts': require('butts-gm'),
-    'mylittlemutant': function(buffer, callback) {
-        //awesome goes here
-        callback(null, someMutatedbuffer)
+    glitches: {
+        trippyshift: require('trippyshift'),
+        butts: require('butts-gm'),
+        mylittlemutant: function(buffer, callback) {
+            //awesome goes here
+            callback(null, someMutatedbuffer);
+        }
     }
 };
 ```
@@ -25,6 +27,29 @@ The mutator should be a function that takes a buffer and a callback. It
 should then execute the callback with a buffer as the second argument
 or an error as the first argument.
 
+Additional Options
+------------------
+**maxDataSize** (number) - set the max size of data that can be POSTed to the service. Default 2000000 (2MB).
+**sampleGif** (string) - file path to a gif image to override the default sample.gif. Note that the guideline is a 60x60 image for samples on the hub.
+**sampleJpg** (string) - file path to a gif image to override the default sample.jpg
+**moreSamples** (array of strings) - array of file paths to additional images to expose as GET urls. The url will be derived from the file name: /myglitch/**pug.gif**. Be sure that your custom file names will not conflict with existing paths (i.e. don't name them sample.jpg or sample.gif)
+
+Here is an example options object with all these options enabled:
+
+```javascript
+var options = {
+    maxDataSize: 1000000,
+    sampleGif: './waybettersample.gif',
+    sampleJpg: './anothersample.jpg',
+    moreSamples: ['./pug.gif', './face.jpg'],
+    glitches: {
+        myglitch: function(buffer, callback) {
+            //awesome goes here
+            callback(null, someMutatedbuffer);
+        }
+    }
+};
+```
 
 Full example Server
 -------------------
@@ -52,30 +77,31 @@ var Hapi = require('hapi'),
 server.pack.register({
     plugin: require('revisit-mutagen'),
     options: {
-        'myglitch': function(buffer, callback) {
-            // you can just write your own glitch inline or require() it in
+        glitches: {
+            myglitch: function(buffer, callback) {
+                // you can just write your own glitch inline or require() it in...
 
-            var readimage = require('readimage'),
-                glitcher = require('glitcher'),
-                gifWriter = require('writegif');
+                var readimage = require('readimage'),
+                    glitcher = require('glitcher'),
+                    gifWriter = require('writegif');
 
-            readimage(buffer, function(err, image) {
-                if (err) {
-                    return callback(err);
-                }
+                readimage(buffer, function(err, image) {
+                    if (err) {
+                        return callback(err);
+                    }
 
-                if (image.frames.length == 1) {
-                    glitcher.rainbowClamp(image.frames[0].data);
-                } else {
-                    glitcher.rainbow(image.frames);
-                }
+                    if (image.frames.length == 1) {
+                        glitcher.rainbowClamp(image.frames[0].data);
+                    } else {
+                        glitcher.rainbow(image.frames);
+                    }
 
-                gifWriter(image, function(err, finalgif) {
-                    return callback(null, finalgif);
+                    gifWriter(image, function(err, finalgif) {
+                        return callback(null, finalgif);
+                    });
+
                 });
-
-            });
-
+            }
         }
     }
 }, function(err) {
@@ -125,6 +151,63 @@ nodemon
 
 Leave a browser window open pointing to `http://localhost:8080/myglitch/livesample.gif` and whenever you want to see the latest iteration just refresh the window.
 
+Even better: add your own image via the **moreSamples** option explained above to use a bigger and better image during development!
 
 
+Modularize
+----------
 
+Eventually you will want to just work with the glitch itself. Just pull it into its own file:
+
+**myglich.js***
+```
+var readimage = require('readimage'),
+    glitcher = require('glitcher'),
+    gifWriter = require('writegif');
+
+module.exports = function(buffer, callback) {
+
+    readimage(buffer, function(err, image) {
+        if (err) {
+            return callback(err);
+        }
+
+        if (image.frames.length == 1) {
+            glitcher.rainbowClamp(image.frames[0].data);
+        } else {
+            glitcher.rainbow(image.frames);
+        }
+
+        gifWriter(image, function(err, finalgif) {
+            return callback(null, finalgif);
+        });
+
+    });
+};
+```
+
+Then, just update the `options.glitches` in **index.js*** to require in your new file.
+```
+server.pack.register({
+    plugin: require('revisit-mutagen'),
+    options: {
+        glitches: {
+            'myglitch': require('./myglitch.js')
+        }
+    }
+}, function(err) {
+    if (err) throw err;
+    server.start(function() {
+
+        // list out all the routes for verification
+        server.table().forEach(function(row) {
+            console.log(server.info.uri + row.path + " (" + row.method + ")");
+        });
+
+        console.log("Hapi server started @", server.info.uri);
+    });
+
+});
+```
+
+**Extra Credit:** publish your glitch as a standalone module and publish it to npm!
