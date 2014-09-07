@@ -159,7 +159,7 @@ Modularize
 
 Eventually you will want to just work with the glitch itself. Just pull it into its own file:
 
-**myglich.js***
+**myglitch.js**
 ```
 var readimage = require('readimage'),
     glitcher = require('glitcher'),
@@ -186,7 +186,7 @@ module.exports = function(buffer, callback) {
 };
 ```
 
-Then, just update the `options.glitches` in **index.js*** to require in your new file.
+Then, just update the `options.glitches` in **index.js** to require in your new file.
 ```
 server.pack.register({
     plugin: require('revisit-mutagen'),
