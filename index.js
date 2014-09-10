@@ -30,7 +30,7 @@ exports.register = function(plugin, options, next) {
     }
 
     if (Array.isArray(glitches)) {
-        //TODO: support an array of "long form" objects and future potential to pass a mutator-specific glitches object.
+        //TODO: support an array of 'long form' objects and future potential to pass a mutator-specific glitches object.
         throw new Error('Arrays of endpoints are not yet supported... Patches welcome?');
     } else {
 
@@ -104,7 +104,7 @@ exports.register = function(plugin, options, next) {
             }
         });
 
-        //more samples will always be "live"
+        //more samples will always be 'live'
         if (moreSamples) {
             moreSamples.forEach(function(sample) {
                 moreSampleBufs[sample] = fs.readFileSync(sample);
@@ -127,7 +127,7 @@ exports.register = function(plugin, options, next) {
         // POST - run the content through the mutator and return a revisit.link compatible object
         plugin.route({
             method: 'POST',
-            path: basePath + "/service",
+            path: basePath + '/service',
             handler: function(request, reply) {
                 var imgBuf = dataUriToBuffer(request.payload.content.data),
                     imgType = imgBuf.type;
@@ -139,7 +139,7 @@ exports.register = function(plugin, options, next) {
 
                     reply({
                         content: {
-                            data: "data:" + imgType + ";base64," + mutatedBuffer.toString('base64'),
+                            data: 'data:' + imgType + ';base64,' + mutatedBuffer.toString('base64'),
                         },
                         meta: request.payload.meta
                     }).code(200);
