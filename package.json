@@ -1,6 +1,6 @@
 {
   "name": "revisit-mutagen",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A hapi plugin to easily expose a http://revisit.link mutation as a service that adheres to http://revisit.link/spec.html",
   "main": "index.js",
   "scripts": {
