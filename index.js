@@ -19,13 +19,21 @@ exports.register = function(plugin, options, next) {
     })
 
     Object.keys(glitches).forEach(function(name) {
+        var glitch = glitches[name],
+        glitchOpts = {}
+
+        if(typeof glitch === 'object') {
+            glitch  = glitches[name].glitch
+            glitchOpts = glitches[name]
+        }
 
         // a bit of validation
         if (!name) throw new Error('No name specified!. Please give me a name!')
-        if (!glitches[name] || typeof glitches[name] !== 'function')
+        if (!glitch || typeof glitch !== 'function')
             throw new Error('No mutator function passed for ' + name + '! Please pass in a mutator!')
-        sampleRoutes.build(name, glitches[name])
-        revisitRoutes.build(name, glitches[name])
+
+        sampleRoutes.build(name, glitch, glitchOpts)
+        revisitRoutes.build(name, glitch, glitchOpts)
     })
 
     next()
