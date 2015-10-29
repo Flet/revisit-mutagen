@@ -24,6 +24,6 @@
   },
   "dependencies": {
     "data-uri-to-buffer": "0.0.4",
-    "joi": "^6.9.1"
+    "joi": "^6.10.0"
   }
 }
