@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/Flet/revisit-mutagen",
   "devDependencies": {
-    "lab": "^6.2.0"
+    "lab": "^7.3.0"
   },
   "dependencies": {
     "data-uri-to-buffer": "0.0.4",
